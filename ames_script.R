@@ -174,8 +174,7 @@ set.seed(44)
 ################################################################################
 # load the file
 ################################################################################
-ames_df <- read.table(paste('C:\\Users\\ryanh\\OneDrive\\Documents\\Northeastern\\',
-      'ALY 6015\\Module 1\\AmesHousing.csv', sep=''),
+ames_df <- read.table(paste('AmesHousing.csv', sep=''),
 header = TRUE, sep=',',row.names = 'PID')
 
 ################################################################################
