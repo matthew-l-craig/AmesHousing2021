@@ -446,7 +446,7 @@ Sys.sleep(3)
 
 corrs <- round(cor(ames_df_1[, unlist(lapply(ames_df_1, is.numeric))], use = "pairwise"),
                2)
-corrplot(corrs, type = "upper", col = brewer.pal( n = 8, name = "RdYlBu"), title = "Exhibit 1: Correlation Plot of The Ames Housing Dataset",mar=c(0,0,1,0))
+corrplot(corrs, type = "upper", col = brewer.pal( n = 8, name = "RdYlBu"), title = "Exhibit 7: Correlation Plot of The Ames Housing Dataset",mar=c(0,0,1,0))
 
 # find the strongest correlations
 corr_df <- process_corr_matrix(corrs, 0.50, -0.50)
