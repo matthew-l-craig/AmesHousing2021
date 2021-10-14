@@ -395,7 +395,7 @@ tableview<-head(ames_df_1)
 
 options(scipen = 100)
 
-ames_df_1$Yr.Sold.1 <- as.factor(ames_df_1$Yr.Sold.1)
+ames_df_1$Yr.Sold.1 <- as.factor(ames_df_1$Yr.Sold)
 
 ggboxplot(ames_df_1, x = "Kitchen.Qual.1", y = "SalePrice",
                 color = "Yr.Sold.1", legend = 'right') + ggtitle('Exhibit 5: Sale Price Based on Kitchen Quality') + xlab('Kitchen Qual') + ylab('Sale Price') 
@@ -534,7 +534,7 @@ print(
 # ################################################################################
 # ################################################################################
 
-################################################################################
+#####################jhgjh###########################################################
 # one-way ANNOVA
 ################################################################################
 writeLines('\n****************************************************************')
