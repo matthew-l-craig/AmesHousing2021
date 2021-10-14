@@ -256,7 +256,7 @@ summary(ames_df_1)
 #Where are the houses?
 ggplot(ames_df_1, aes(x=Neighborhood)) + geom_bar(color="darkblue",fill="blue",
                                                                alpha=0.5)+
-  ggtitle("Exhibit 1:Historgram of Ames Housing Sales by Neighborhood" )+
+  ggtitle("Exhibit 1:Histogram of Ames Housing Sales by Neighborhood" )+
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
 
 #How expensive are the houses?
@@ -264,7 +264,7 @@ mu<- mean(ames_df_1$SalePrice)
 
 ggplot(ames_df_1, aes(x=SalePrice)) + geom_histogram(color="darkblue",fill="blue",
                                                                alpha=0.5, bins = 50)+
-  ggtitle("Exhibit 1:Historgram of Ames Housing Sale Prices" )+
+  ggtitle("Exhibit 2:Histogram of Ames Housing Sale Prices" )+
   labs(x="Sale Price")+
   scale_x_continuous(labels=scales::dollar_format())+
   geom_vline(xintercept = mu, color= "red", linetype= "dashed")+
@@ -274,17 +274,17 @@ ggplot(ames_df_1, aes(x=SalePrice)) + geom_histogram(color="darkblue",fill="blue
 #When were the houses built?
 ggplot(ames_df_1, aes(x=Year.Built))+ geom_histogram(color="darkblue",fill="blue",
                                                                alpha=0.5, stat="count")+
-  ggtitle("Exhibit 1:Historgram of the Year Homes were Built within Ames City Limits" )
+  ggtitle("Exhibit 3:Histogram of the Year Homes were Built within Ames City Limits" )
 
 
 #When were the houses sold?
 ggplot(ames_df_1, aes(x=Yr.Sold)) + geom_histogram(color="darkblue",fill="blue",
                                                                alpha=0.5)+
-  ggtitle("Exhibit 1:Historgram of Ames Housing Sales by Year" )
+  ggtitle("Exhibit x:Histogram of Ames Housing Sales by Year" )
 
 ggplot(ames_df_1, aes(x=Mo.Sold)) + geom_histogram(color="darkblue",fill="blue",
                                                              alpha=0.5)+
-  ggtitle("Exhibit 1:Historgram of Ames Housing Sales by Month" )+
+  ggtitle("Exhibit x:Historgram of Ames Housing Sales by Month" )+
   scale_x_continuous(breaks = seq(1, 12, 1))
 
 #trend 
@@ -296,7 +296,7 @@ ames_df_1 %>% count(Date) %>%
 #How big are the houses?
 ggplot(ames_df_1, aes(x=ames_df_1$Gr.Liv.Area)) + geom_histogram(color="darkblue",fill="blue",
                                                              alpha=0.5)+
-  ggtitle("Exhibit 1:Historgram of Ames Housing Sizes by Above Grade Livable Area (SF)" )
+  ggtitle("Exhibit 4:Histogram of Home Sizes by Above Gr. SF" ) + xlab('Square Footage')
 
 #How big are the lots?
 
@@ -306,7 +306,7 @@ acres<- ames_df_1$Lot.Area/43560
 ggplot(ames_df_1, aes(x=acres)) + geom_histogram(color="darkblue",fill="blue",
                                                                  alpha=0.5,
                                                  bins = 50)+
-  ggtitle("Exhibit 1:Historgram of Ames Housing Lot Sizes (SF)")
+  ggtitle("Exhibit x:Historgram of Ames Housing Lot Sizes (SF)")
 ################################################################################
 ################################################################################
 ################################################################################
@@ -393,11 +393,15 @@ tableview<-head(ames_df_1)
 # Visualize data
 ################################################################################
 
-print(ggboxplot(ames_df_1, x = "Kitchen", y = "SalePrice",
-                color = "Yr.Sold"))
+options(scipen = 100)
 
-print(ggboxplot(ames_df_1, x = "Garage.Cars", y = "SalePrice",
-                color = "Yr.Sold"))
+ames_df_1$Yr.Sold.1 <- as.factor(ames_df_1$Yr.Sold.1)
+
+ggboxplot(ames_df_1, x = "Kitchen.Qual.1", y = "SalePrice",
+                color = "Yr.Sold.1", legend = 'right') + ggtitle('Exhibit 5: Sale Price Based on Kitchen Quality') + xlab('Kitchen Qual') + ylab('Sale Price') 
+
+ggboxplot(ames_df_1, x = "Garage.Cars", y = "SalePrice",
+                color = "Yr.Sold.1", legend = 'right') + ggtitle('Exhibit 6: Sale Price Based on Garage Size') + xlab('Car Bays') + ylab('Sale Price') 
 
 
 Sys.sleep(3)
