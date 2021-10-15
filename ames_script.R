@@ -1,4 +1,3 @@
-# Venkatesh - Git check-in test
 ################################################################################
 # prepare the environment for reproducibility
 ################################################################################
@@ -124,7 +123,7 @@ classifier_performance <-
     writeLines('\n****************************************************************')
     writeLines(paste(a_data_df_name, ' set predictions using model ', 
                      a_model_name, '\n', sep = ''))
-    
+  
     y_probs <- predict(a_model, a_data_df, type = 'response')
     y_preds <- as.factor(ifelse(y_probs >= 0.50, 'Yes', 'No'))
     
@@ -593,14 +592,14 @@ writeLines('H1: There is a difference in sales price of houses with different be
 writeLines('Claim: H1')
 
 # Bathrooms
-WriteLines('H0: There is no difference in sales price of houses with different bathroom types')
-WriteLines('H1: There is a difference in sales price of houses with different bathroom types')
-WriteLines('Claim: H1')
+writeLines('H0: There is no difference in sales price of houses with different bathroom types')
+writeLines('H1: There is a difference in sales price of houses with different bathroom types')
+writeLines('Claim: H1')
 
 #Bedrooms & Bathrooms Hypothesis
-WriteLines('H0: There is no interaction effect between type of bedroom and type of bathroom on sales price')
-WriteLines('H1: There is an interaction effect between type of bedroom and type of bathroom on sales price')
-WriteLines('Claim: H1')
+writeLines('H0: There is no interaction effect between type of bedroom and type of bathroom on sales price')
+writeLines('H1: There is an interaction effect between type of bedroom and type of bathroom on sales price')
+writeLines('Claim: H1')
 
 ################################################################################
 # # compute two-way anova
@@ -630,19 +629,43 @@ print(
 
 
 ################################################################################
-# fit a regression model - model 3 with factor attributes
+# fit a regression model - try models with various attributes
 ################################################################################
+writeLines('\n****************************************************************')
+writeLines('fit various regression models:')
+
 fit_3 <- lm(formula = SalePrice ~ Gr.Liv.Area + Garage.Area + Overall.Qual +
               Kitchen.Qual, data = ames_df_1)
-
-
 print(summary(fit_3))
-
 par(mfrow = c(2,2))
 plot(fit_3)
 par(mfrow = c(1,1))
 
 vif(fit_3)
+
+# fit_5 <- lm(formula = SalePrice ~ Gr.Liv.Area + Garage.Area + Overall.Qual +
+#               Kitchen.Qual + Mas.Vnr.Area  + Total.Bsmt.SF + TotRms.AbvGrd, 
+#             data = ames_df_1)
+
+fit_4 <- lm(formula = SalePrice ~ Gr.Liv.Area + Garage.Area + Overall.Qual +
+              Kitchen.Qual + Mas.Vnr.Area  + Total.Bsmt.SF, 
+            data = ames_df_1)
+
+print(summary(fit_4))
+
+par(mfrow = c(2,2))
+plot(fit_3)
+par(mfrow = c(1,1))
+
+vif(fit_4)
+
+# compare models
+AIC(fit_3, fit_4)
+BIC(fit_3, fit_4)
+anova (fit_3, fit_4)
+
+# pick the best model
+writeLines('The model chosen is: fit_4')
 ################################################################################
 ################################################################################
 ################################################################################
@@ -660,10 +683,28 @@ vif(fit_3)
 # ################################################################################
 # ################################################################################
 
+################################################################################
+# make a prediction with model 4
+################################################################################
+# the_data <- df_1[, c('Gr.Liv.Area', 'Garage.Area', 'Total.Bsmt.SF')]
+the_data <- ames_df_1[, c('Gr.Liv.Area', 'Garage.Area', 'Overall.Qual', 'Kitchen.Qual', 'Mas.Vnr.Area', 'Total.Bsmt.SF')]
 
+pred <- predict(fit_4, the_data)
+plot(ames_df_1$SalePrice, pred, main = 'pred vs actaul\nall points on blue line is a perfect fit')
+abline(a=0, b=1, col= 'blue')
+grid(col = "black")
 
+# predicted and actual
+writeLines('Print predicted and actual values')
+predicted <- pred[1]
+actual <- ames_df_1[1, c('SalePrice')]
 
-
+# mae mean absolute error
+writeLines('Print mean absolute error and fraction')
+ames_df_1_mae <- mae(ames_df_1$SalePrice, pred)
+frac_ames_df_1_mae <- mae(ames_df_1$SalePrice, pred) / mean(ames_df_1$SalePrice)  
+print(ames_df_1_mae)
+print(frac_ames_df_1_mae)
 
 ################################################################################
 #Logistic Regression - Central Air Predictors?
