@@ -395,13 +395,13 @@ tableview<-head(ames_df_1)
 
 options(scipen = 100)
 
-ames_df_1$Yr.Sold <- as.factor(ames_df_1$Yr.Sold)
+ames_df_1$Yr.Sold.1 <- as.factor(ames_df_1$Yr.Sold)
 
-ggboxplot(ames_df_1, x = "Kitchen.Qual", y = "SalePrice",
-                color = "Yr.Sold", legend = 'right') + ggtitle('Exhibit 5: Sale Price Based on Kitchen Quality') + xlab('Kitchen Qual') + ylab('Sale Price') 
+ggboxplot(ames_df_1, x = "Kitchen.Qual.1", y = "SalePrice",
+                color = "Yr.Sold.1", legend = 'right') + ggtitle('Exhibit 5: Sale Price Based on Kitchen Quality') + xlab('Kitchen Qual') + ylab('Sale Price') 
 
 ggboxplot(ames_df_1, x = "Garage.Cars", y = "SalePrice",
-                color = "Yr.Sold", legend = 'right') + ggtitle('Exhibit 6: Sale Price Based on Garage Size') + xlab('Car Bays') + ylab('Sale Price') 
+                color = "Yr.Sold.1", legend = 'right') + ggtitle('Exhibit 6: Sale Price Based on Garage Size') + xlab('Car Bays') + ylab('Sale Price') 
 
 
 Sys.sleep(3)
