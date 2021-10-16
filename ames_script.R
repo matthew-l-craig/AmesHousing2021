@@ -123,11 +123,15 @@ classifier_performance <-
     writeLines('\n****************************************************************')
     writeLines(paste(a_data_df_name, ' set predictions using model ', 
                      a_model_name, '\n', sep = ''))
-  
-    y_probs <- predict(a_model, a_data_df, type = 'response')
-    y_preds <- as.factor(ifelse(y_probs >= 0.50, 'Yes', 'No'))
+     
+      
+    #https://arulvelkumar.wordpress.com/2017/07/06/confusionmatrix-function-in-r-the-data-contain-levels-not-found-in-the-data/
     
-    classification_report <- confusionMatrix(y_preds, y_true, positive = 'Yes')
+    y_probs <- predict(a_model, a_data_df, type = 'response')
+    y_preds <- as.factor(ifelse(y_probs >= 0.50, 'Y', 'N'))
+    
+    #classification_report <- confusionMatrix(y_preds, y_true, positive = 'Yes')
+    classification_report <- confusionMatrix(y_preds, y_true)
     if (print_classification_report) {
       writeLines('\nsensitivity = recall')
       writeLines('positive predictive value = precision')
