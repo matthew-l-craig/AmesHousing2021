@@ -264,6 +264,31 @@ ggplot(ames_df_1, aes(x=Neighborhood)) + geom_bar(color="darkblue",fill="blue",
   ggtitle("Exhibit 1:Histogram of Ames Housing Sales by Neighborhood" )+
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
 
+#average sale in each neighborhood
+
+average_sale<- ames_df_1 %>% 
+  group_by(Neighborhood) %>% 
+  summarise(avgSalePrice=mean(SalePrice))
+
+ggplot(average_sale)+ aes(x=Neighborhood,y=avgSalePrice)+
+  geom_bar(stat= "identity", color="darkblue",fill="blue",
+           alpha=0.5)+
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
+scale_y_continuous(labels=scales::dollar_format())+
+  ggtitle("Exhibit 1:Average Sale Price per Neighborhood")
+  
+  
+ggplot(ames_df_1, aes(x=Neighborhood)) + geom_bar(color="darkblue",fill="blue",
+                                                  alpha=0.5)+
+  ggtitle("Exhibit 1:Histogram of Ames Housing Sales by Neighborhood" )+
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+
+
+
+
+
+
+
 #How expensive are the houses?
 mu<- mean(ames_df_1$SalePrice)
 
