@@ -43,6 +43,7 @@ library(gridExtra)
 library(pROC)
 library(scales)
 library(stats)
+library(sqldf)
 ################################################################################
 # Helpful functions
 ################################################################################
@@ -748,6 +749,17 @@ ggplot(ames_df_1) + geom_boxplot(aes(x=Central.Air, y= Gr.Liv.Area),color="darkb
 attach(ames_df_1)
 
 ggplot() + geom_bar( aes(x = Yr.Sold, fill = Neighborhood)) + ggtitle('Count of Homes Sold per Yr Factored by Neighborhood') + xlab('Year Sold')
+
+homes_sold_by_yr <- as.data.frame(sqldf('SELECT count("Lot.Area") as count, "Yr.Sold" FROM ames_df_1 GROUP BY "Yr.Sold"'))
+
+match_yr <- function(Yr){
+  
+  return(with(homes_sold_by_yr, count[Yr.Sold == Yr]))
+  
+}
+ames_df_1 <- ames_df_1 %>%
+  rowwise() %>%
+    mutate(total_sold_that_year = match_yr(Yr.Sold))
 
 
 ################################################################################
