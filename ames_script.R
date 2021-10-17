@@ -288,7 +288,7 @@ ggplot(ames_df_1, aes(x=Yr.Sold)) + geom_histogram(color="darkblue",fill="blue",
 
 ggplot(ames_df_1, aes(x=Mo.Sold)) + geom_histogram(color="darkblue",fill="blue",
                                                              alpha=0.5)+
-  ggtitle("Exhibit x:Historgram of Ames Housing Sales by Month" )+
+  ggtitle("Exhibit x:Histogram of Ames Housing Sales by Month" )+
   scale_x_continuous(breaks = seq(1, 12, 1))
 
 #trend 
@@ -319,7 +319,7 @@ ggplot(ames_df_1, aes(x=acres)) + geom_histogram(color="darkblue",fill="blue",
 # Explore missingness graphically
 ################################################################################
 aggr(ames_df_1,prop=TRUE, numbers=TRUE)
-matrixplot(ames_df_1)
+matrixplot(ames_df_1, labels = TRUE)
 ################################################################################
 ################################################################################
 ################################################################################
@@ -369,23 +369,23 @@ aggr(ames_df_1, prop = TRUE, numbers = TRUE)
 ################################################################################
 # eda continued, mostly forloop for scatter plots
 ################################################################################
-for (col_name in colnames(ames_df_1)) {
-  x <- tryCatch(    #not necessarily needed
-    {
-      if (col_name != 'SalePrice') {
-        scatterplot(ames_df_1$SalePrice ~ ames_df_1[, col_name], 
-                    main= paste('ames_df_1$SalePrice ~', col_name),
-                    xlab = col_name, id = list(n=0))
-      }
-    },
-    error = function(e) {
-      print(e)
-      print(paste("col_name:", col_name))
-      print(typeof(ames_df_1[, col_name]))
-      print(cat("first 5 values of col_name:", ames_df_1[1:5, col_name], '\n\n'))
-    }
-  )
-}
+#for (col_name in colnames(ames_df_1)) {
+#  x <- tryCatch(    #not necessarily needed
+#    {
+#      if (col_name != 'SalePrice') {
+#        scatterplot(ames_df_1$SalePrice ~ ames_df_1[, col_name], 
+#                    main= paste('ames_df_1$SalePrice ~', col_name),
+#                    xlab = col_name, id = list(n=0))
+#      }
+#    },
+#    error = function(e) {
+#      print(e)
+#      print(paste("col_name:", col_name))
+#      print(typeof(ames_df_1[, col_name]))
+#      print(cat("first 5 values of col_name:", ames_df_1[1:5, col_name], '\n\n'))
+#    }
+#  )
+#}
 
 summary(ames_df_1)
 tableview<-head(ames_df_1)
@@ -733,11 +733,21 @@ ggplot(ames_df_1) + geom_boxplot(aes(x=Central.Air, y= SalePrice),color="darkblu
   labs(x="Central Air")+
 scale_y_continuous(labels=scales::dollar_format())
 
+# Why are some sale prices so low?
+
+ames_df_low_price <- filter(ames_df_1, SalePrice < 100000)
+
+summary(ames_df_low_price)
+
 
 ggplot(ames_df_1) + geom_boxplot(aes(x=Central.Air, y= Gr.Liv.Area),color="darkblue",fill="blue",
                                  alpha=0.5)+
   ggtitle("Exhibit 3:Boxplot of Central Air Homes vs Above Ground Livable Area (SF)" )+
   labs(x="Central Air")
+
+attach(ames_df_1)
+
+ggplot() + geom_bar( aes(x = Yr.Sold, fill = Neighborhood)) + ggtitle('Count of Homes Sold per Yr Factored by Neighborhood') + xlab('Year Sold')
 
 
 ################################################################################
