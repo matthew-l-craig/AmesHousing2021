@@ -463,9 +463,16 @@ ames_df_1 <- ames_df_1 %>%
   mutate(total_sold_that_year = match_yr(Yr.Sold))
 
 
+
 corrs <- round(cor(ames_df_1[, unlist(lapply(ames_df_1, is.numeric))], use = "pairwise"),
                2)
 corrplot(corrs, type = "upper", col = brewer.pal( n = 8, name = "RdYlBu"), title = "Exhibit 7: Correlation Plot of The Ames Housing Dataset",mar=c(0,0,1,0))
+
+# Second corrplot with only homes built before 2000
+corrs <- round(cor(filter(ames_df_1, Year.Built < 2000)[, unlist(lapply(ames_df_1, is.numeric))], use = "pairwise"),
+               2)
+corrplot(corrs, type = "upper", col = brewer.pal( n = 8, name = "RdYlBu"), title = "Exhibit 7: Correlation Plot of Home Built < 2000",mar=c(0,0,1,0))
+
 
 # find the strongest correlations
 corr_df <- process_corr_matrix(corrs, 0.50, -0.50)
