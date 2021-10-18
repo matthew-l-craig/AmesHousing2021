@@ -730,7 +730,8 @@ writeLines('The model chosen is: fit_4')
 the_data <- ames_df_1[, c('Gr.Liv.Area', 'Garage.Area', 'Overall.Qual', 'Kitchen.Qual', 'Mas.Vnr.Area', 'Total.Bsmt.SF')]
 
 pred <- predict(fit_4, the_data)
-plot(ames_df_1$SalePrice, pred, main = 'pred vs actaul\nall points on blue line is a perfect fit')
+plot(ames_df_1$SalePrice, pred, main = 'Exhibit xx: predicted vs actual sale price',
+     xlab = 'Actual sale price', ylab = 'Predicted sale price')
 abline(a=0, b=1, col= 'blue')
 grid(col = "black")
 
