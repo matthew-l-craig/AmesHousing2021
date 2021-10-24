@@ -546,34 +546,12 @@ print(
     )
 )
 
-# ################################################################################
-# # Which pair of means are different
-# ################################################################################
-# writeLines('\n****************************************************************')
-# writeLines('which pair of means are different:')
-# # print(TukeyHSD(result2, which = "Bldg.Type"))
-# # print(TukeyHSD(result2, which = "Neighborhood"))
-# #print(TukeyHSD(result2))
-# 
-# writeLines('\n****************************************************************')
-# writeLines('check anova assumptions:')
-# 
-# writeLines('\n************************')
-# writeLines('Homogeneity of variances')
-# plot(result2, 1)
-# print(leveneTest(SalePrice ~ Bldg.Type * Neighborhood, data = ames_df_1))
-# 
-# writeLines('\n************************')
-# writeLines('Normality')
-# plot(result2, 2)
-# # extract the residuals and run Shapiro-Wilk test
-# aov_residuals <- residuals(object = result2)
-# #print(shapiro.test(x = aov_residuals))
-# ################################################################################
-# ################################################################################
-# ################################################################################
 
-#####################jhgjh###########################################################
+################################################################################
+################################################################################
+################################################################################
+
+################################################################################
 # one-way ANNOVA
 ################################################################################
 writeLines('\n****************************************************************')
@@ -613,14 +591,10 @@ if (p_value > alpha) {
   decision = 'reject h0'
 }
 writeLines(paste('decision: ', decision))
+################################################################################
+################################################################################
+################################################################################
 
-writeLines('\n***************************')
-writeLines('use TukeyHSD to understand differences between the means\n')
-# see differences
-# diff: differences between the means
-# lwr, upr: bounds of 95% confidence intervals for diff
-# p adj: adjusted for multiple comparisons
-print(TukeyHSD(anova))
 
 ################################################################################
 # Developing Hypothesis - Two way anova
@@ -662,8 +636,18 @@ print(
                      sd = sd(SalePrice, na.rm = TRUE)
     )
 )
+################################################################################
+################################################################################
+################################################################################
 
-###Tukey?????????
+################################################################################
+# Tukey
+################################################################################
+writeLines('\n****************************************************************')
+writeLines('which pair of means are different in bedrooms and full baths:')
+print(TukeyHSD(result2, which = "Bedroom.AbvGr"))
+print(TukeyHSD(result2, which = "Full.Bath"))
+print(TukeyHSD(result2))
 
 
 
