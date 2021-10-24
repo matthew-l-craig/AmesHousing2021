@@ -105,12 +105,11 @@ classifier_roc_auc <- function(a_y_probs, a_y_true) {
   
   an_roc <- roc(a_y_true, a_y_probs)
   
-  print(plot(an_roc, col = 'blue', xlab = 'FPR', 
-             ylab = 'sensitivity (recall or TPR)'))
+  print(plot(an_roc, col = 'blue', xlab = '1 - Specificity (FPR)', 
+             legacy.axes=TRUE,
+             ylab = 'Sensitivity (Recall or TPR)'))
   grid(col = 'black')
-  
-  
-  
+
   an_auc <- auc(an_roc)
   # writeLines(paste('ROC AUC: ', an_auc))
   #area under curve
@@ -263,6 +262,31 @@ ggplot(ames_df_1, aes(x=Neighborhood)) + geom_bar(color="darkblue",fill="blue",
                                                                alpha=0.5)+
   ggtitle("Exhibit 1:Histogram of Ames Housing Sales by Neighborhood" )+
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+
+#average sale in each neighborhood
+
+average_sale<- ames_df_1 %>% 
+  group_by(Neighborhood) %>% 
+  summarise(avgSalePrice=mean(SalePrice))
+
+ggplot(average_sale)+ aes(x=Neighborhood,y=avgSalePrice)+
+  geom_bar(stat= "identity", color="darkblue",fill="blue",
+           alpha=0.5)+
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
+scale_y_continuous(labels=scales::dollar_format())+
+  ggtitle("Exhibit 1:Average Sale Price per Neighborhood")
+  
+  
+ggplot(ames_df_1, aes(x=Neighborhood)) + geom_bar(color="darkblue",fill="blue",
+                                                  alpha=0.5)+
+  ggtitle("Exhibit 1:Histogram of Ames Housing Sales by Neighborhood" )+
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+
+
+
+
+
+
 
 #How expensive are the houses?
 mu<- mean(ames_df_1$SalePrice)
@@ -712,7 +736,8 @@ writeLines('The model chosen is: fit_4')
 the_data <- ames_df_1[, c('Gr.Liv.Area', 'Garage.Area', 'Overall.Qual', 'Kitchen.Qual', 'Mas.Vnr.Area', 'Total.Bsmt.SF')]
 
 pred <- predict(fit_4, the_data)
-plot(ames_df_1$SalePrice, pred, main = 'pred vs actaul\nall points on blue line is a perfect fit')
+plot(ames_df_1$SalePrice, pred, main = 'Exhibit 5: predicted vs actual sale price',
+     xlab = 'Actual sale price', ylab = 'Predicted sale price')
 abline(a=0, b=1, col= 'blue')
 grid(col = "black")
 
@@ -828,6 +853,28 @@ writeLines('\n*********************')
 writeLines('display regression coefficients (odds)\n')
 print(exp(coef(model_1)))
 
+writeLines('\n*********************')
+writeLines('model_2\n')
+
+model_2 <- glm(Central.Air ~ Year.Built+Gr.Liv.Area+SalePrice+Yr.Sold, data = train_df, family = binomial(link = 'logit'))
+print(summary(model_2))
+return_list <- log_reg_pseudo_r_square(model_2)
+r_square_model_2 <- return_list['r_square'][[1]]
+p_value_model_2 <- return_list['p_value'][[1]]
+
+writeLines('\n*********************')
+writeLines('McFadden\'s Pseudo R^2 and its p-value:\n')
+writeLines(paste('McFadden\'s Pseudo R^2: ', r_square_model_2))
+writeLines(paste('McFadden\'s Pseudo R^2 p-value: ', p_value_model_2))
+
+writeLines('\n*********************')
+writeLines('display regression coefficients (log-odds)\n')
+print(coef(model_2))
+
+writeLines('\n*********************')
+writeLines('display regression coefficients (odds)\n')
+print(exp(coef(model_2)))
+
 ################################################################################
 ################################################################################
 ################################################################################
@@ -838,7 +885,7 @@ print(exp(coef(model_1)))
 writeLines('\n****************************************************************')
 
 
-return_list <- classifier_performance(model_1, a_model_name = 'model_1', 
+return_list <- classifier_performance(model_2, a_model_name = 'model_2', 
                                       train_df, a_data_df_name = 'train_df', 
                                       y_true = train_df$Central.Air, FALSE)
 title("Exitibit 7: Train Data ROC Curve Plot", line = 3)
@@ -871,7 +918,7 @@ print(unname(classification_report_train$byClass['Specificity']))
 ################################################################################
 writeLines('\n****************************************************************')
 
-return_list <- classifier_performance(model_1, a_model_name = 'model_1', 
+return_list <- classifier_performance(model_2, a_model_name = 'model_2', 
                                       test_df, a_data_df_name = 'test_df', 
                                       y_true = test_df$Central.Air, FALSE)
 title("Exitibit 8: Test Data ROC Curve Plot", line= 3)
@@ -888,6 +935,8 @@ writeLines('\nsensitivity (also known as recall):')
 print(unname(classification_report_test$byClass['Sensitivity']))
 writeLines('\npositive predictive value (also known as precision):')
 print(unname(classification_report_test$byClass['Pos Pred Value']))
+writeLines('\nspecificity (also known as true negative rate):')
+print(unname(classification_report_test$byClass['Specificity']))
 ################################################################################
 ################################################################################
 ################################################################################
