@@ -23,10 +23,6 @@ if (!is.null(names(sessionInfo()$otherPkgs))) {
          unload = TRUE)
 }
 
-################################################################################
-# install and load libraries
-################################################################################
-
 library(car)
 library(ggpubr)
 library(dplyr)
@@ -37,16 +33,13 @@ library(FSA)
 library(hash)
 library(VIM)
 library(Metrics)
-library(ISLR)
 library(caret)  
 library(gridExtra)
 library(pROC)
 library(scales)
 library(stats)
 library(sqldf)
-################################################################################
-# Helpful functions
-################################################################################
+
 process_corr_matrix<-function(corr_matrix,pos_corr_thresh, neg_corr_thresh) {
   
   # Get pairwise table
@@ -166,18 +159,11 @@ log_reg_pseudo_r_square <- function(logistic) {
   
   return(list('r_square' = r_square, 'p_value' = p_value))
 }
-################################################################################ 
-################################################################################
-################################################################################
 
-################################################################################
-# set the seed for reproducibility
-################################################################################
 set.seed(44)
 
-################################################################################
-# load the file
-################################################################################
+
+dirname(rstudioapi::getActiveDocumentContext()$path)
 ames_df <- read.table(paste('AmesHousing.csv', sep=''),
 header = TRUE, sep=',',row.names = 'PID')
 
@@ -207,9 +193,6 @@ ames_df_1<-filter(ames_df, ames_df$Bldg.Type=='1Fam', ames_df$Sale.Condition=='N
 
 ames_df_1 <- ames_df_1[colnames(ames_df_1) %in% attrs]
 ames_df_1$Date<- as.Date(paste(ames_df_1$Yr.Sold,ames_df_1$Mo.Sold, "01",sep = "-"))
-################################################################################
-################################################################################
-################################################################################
 
 ################################################################################
 #Prepare attributes for regression by making them factors
@@ -336,18 +319,12 @@ ggplot(ames_df_1, aes(x=acres)) + geom_histogram(color="darkblue",fill="blue",
                                                                  alpha=0.5,
                                                  bins = 50)+
   ggtitle("Exhibit x:Historgram of Ames Housing Lot Sizes (SF)")
-################################################################################
-################################################################################
-################################################################################
 
 ################################################################################
 # Explore missingness graphically
 ################################################################################
 aggr(ames_df_1,prop=TRUE, numbers=TRUE)
 matrixplot(ames_df_1, labels = TRUE)
-################################################################################
-################################################################################
-################################################################################
 
 ################################################################################
 #Explore missingness 
@@ -377,9 +354,6 @@ missingness_df <- data.frame(attr = attr_vector, frac_missingness=
 print(keeps)
 print(drops)
 ames_df_1 <- ames_df_1[keeps]
-################################################################################
-################################################################################
-################################################################################
 
 ################################################################################
 # input "0" in the blank entries within Mas.Vnr.Type 
@@ -387,36 +361,10 @@ ames_df_1 <- ames_df_1[keeps]
 
 ames_df_1$Mas.Vnr.Area<-ifelse(is.na(ames_df_1$Mas.Vnr.Area),0,ames_df_1$Mas.Vnr.Area)
 aggr(ames_df_1, prop = TRUE, numbers = TRUE)
-################################################################################
-################################################################################
-################################################################################
 
-################################################################################
-# eda continued, mostly forloop for scatter plots
-################################################################################
-#for (col_name in colnames(ames_df_1)) {
-#  x <- tryCatch(    #not necessarily needed
-#    {
-#      if (col_name != 'SalePrice') {
-#        scatterplot(ames_df_1$SalePrice ~ ames_df_1[, col_name], 
-#                    main= paste('ames_df_1$SalePrice ~', col_name),
-#                    xlab = col_name, id = list(n=0))
-#      }
-#    },
-#    error = function(e) {
-#      print(e)
-#      print(paste("col_name:", col_name))
-#      print(typeof(ames_df_1[, col_name]))
-#      print(cat("first 5 values of col_name:", ames_df_1[1:5, col_name], '\n\n'))
-#    }
-#  )
-#}
 
 summary(ames_df_1)
 tableview<-head(ames_df_1)
-################################################################################
-################################################################################
-################################################################################
 
 ################################################################################
 # Visualize data
@@ -435,43 +383,6 @@ ggboxplot(ames_df_1, x = "Garage.Cars", y = "SalePrice",
 
 Sys.sleep(3)
 
-# # Two-way interaction plot - view with Garage type as x factor
-# interaction.plot(x.factor = ames_df_1$Garage.Cars, trace.factor = ames_df_1$Neighborhood,
-#                  response = ames_df_1$SalePrice, fun = mean, type = "b", legend = TRUE,
-#                  xlab = "Garage.Type", ylab = "SalePrice", pch = c(1, 19))
-# 
-# # view with density on x axis
-# print(ggboxplot(cp_df, x = "density", y = "yield", color = "fertilizer", 
-#                 palette = c("#00AFBB", "#E7B800", "#FF0000")))
-# print(ggline(cp_df, x = "density", y = "yield", color = "fertilizer",
-#              add = c("mean_se"), palette = c("#00AFBB", "#E7B800", "#FF0000")))
-# Sys.sleep(3)
-# 
-# # view with fertilizer on x axis
-# print(ggboxplot(cp_df, x = "fertilizer", y = "yield", color = "density", 
-#                 palette = c("#00AFBB", "#E7B800", "#FF0000")))
-# print(ggline(cp_df, x = "fertilizer", y = "yield", color = "density",
-#              add = c("mean_se"), palette = c("#00AFBB", "#E7B800", "#FF0000")))
-# Sys.sleep(3)
-# 
-# # Box plot with two factor variables - view with density as first
-# boxplot(yield ~ density * fertilizer, data = cp_df, frame = FALSE, 
-#         ylab = "yield")
-# # Two-way interaction plot - view with density as x factor
-# interaction.plot(x.factor = cp_df$density, trace.factor = cp_df$fertilizer, 
-#                  response = cp_df$yield, fun = mean, type = "b", legend = TRUE, 
-#                  xlab = "density", ylab = "yield", pch = c(1, 19))
-# 
-# # Box plot with two factor variables - view with fertilizer as first
-# boxplot(yield ~ fertilizer * density, data = cp_df, frame = FALSE, 
-#         ylab = "yield")
-# # Two-way interaction plot - view with density as x factor
-# interaction.plot(x.factor = cp_df$fertilizer, trace.factor = cp_df$density, 
-#                  response = cp_df$yield, fun = mean, type = "b", legend = TRUE, 
-#                  xlab = "density", ylab = "yield", pch = c(1, 19))
-
-################################################################################
-# check out correlations
 ################################################################################
 # check out correlations for numerical variables
 
@@ -504,9 +415,6 @@ sale_price_corr_df = corr_df[corr_df['Var1'] == 'SalePrice'|
                                corr_df['Var2']== 'SalePrice',]
 multi_corr_df <- corr_df[corr_df['Var1'] != 'SalePrice' &
                            corr_df['Var2'] != 'SalePrice',]
-################################################################################
-################################################################################
-################################################################################
 
 ################################################################################
 # Developing Hypothesis - One way anova
@@ -528,15 +436,6 @@ multi_corr_df <- corr_df[corr_df['Var1'] != 'SalePrice' &
 # neighborhood on sales price
 # Claim: H1
 
-################################################################################
-# # compute two-way anova
-# ################################################################################
-# writeLines('\n****************************************************************')
-# writeLines('compute two-way anova:')
-# result <- aov(SalePrice ~ Bldg.Type + Neighborhood, data = ames_df_1)
-# summary(result)
-# result2 <- aov(SalePrice ~ Bldg.Type * Neighborhood, data = ames_df_1)
-# summary(result2)
 
 ################################################################################
 # compute summary statistics
@@ -552,33 +451,6 @@ print(
                      sd = sd(SalePrice, na.rm = TRUE)
     )
 )
-
-# ################################################################################
-# # Which pair of means are different
-# ################################################################################
-# writeLines('\n****************************************************************')
-# writeLines('which pair of means are different:')
-# # print(TukeyHSD(result2, which = "Bldg.Type"))
-# # print(TukeyHSD(result2, which = "Neighborhood"))
-# #print(TukeyHSD(result2))
-# 
-# writeLines('\n****************************************************************')
-# writeLines('check anova assumptions:')
-# 
-# writeLines('\n************************')
-# writeLines('Homogeneity of variances')
-# plot(result2, 1)
-# print(leveneTest(SalePrice ~ Bldg.Type * Neighborhood, data = ames_df_1))
-# 
-# writeLines('\n************************')
-# writeLines('Normality')
-# plot(result2, 2)
-# # extract the residuals and run Shapiro-Wilk test
-# aov_residuals <- residuals(object = result2)
-# #print(shapiro.test(x = aov_residuals))
-# ################################################################################
-# ################################################################################
-# ################################################################################
 
 #####################jhgjh###########################################################
 # one-way ANNOVA
@@ -670,10 +542,6 @@ print(
     )
 )
 
-###Tukey?????????
-
-
-
 ################################################################################
 # fit a regression model - try models with various attributes
 ################################################################################
@@ -688,10 +556,6 @@ plot(fit_3)
 par(mfrow = c(1,1))
 
 vif(fit_3)
-
-# fit_5 <- lm(formula = SalePrice ~ Gr.Liv.Area + Garage.Area + Overall.Qual +
-#               Kitchen.Qual + Mas.Vnr.Area  + Total.Bsmt.SF + TotRms.AbvGrd, 
-#             data = ames_df_1)
 
 fit_4 <- lm(formula = SalePrice ~ Gr.Liv.Area + Garage.Area + Overall.Qual +
               Kitchen.Qual + Mas.Vnr.Area  + Total.Bsmt.SF, 
@@ -712,22 +576,6 @@ anova (fit_3, fit_4)
 
 # pick the best model
 writeLines('The model chosen is: fit_4')
-################################################################################
-################################################################################
-################################################################################
-
-
-################################################################################
-#make a prediction using fit 1
-################################################################################
-# the_data <- df_1[, c('Gr.Liv.Area','Garage.Area', 'X1st.Flr.SF')]
-# pred<- predict(fit_1, the_data)
-# print(the_data[1,])
-# print(pred[1])
-# print(df_1[1, c('SalePrice')])
-# ################################################################################
-# ################################################################################
-# ################################################################################
 
 ################################################################################
 # make a prediction with model 4
@@ -756,10 +604,6 @@ print(frac_ames_df_1_mae)
 ################################################################################
 #Logistic Regression - Central Air Predictors?
 ################################################################################
-################################################################################
-################################################################################
-
-
 ################################################################################
 #Plots
 ################################################################################
@@ -792,10 +636,6 @@ attach(ames_df_1)
 
 ggplot() + geom_bar( aes(x = Yr.Sold, fill = Neighborhood)) + ggtitle('Count of Homes Sold per Yr Factored by Neighborhood') + xlab('Year Sold')
 
-
-################################################################################
-################################################################################
-################################################################################
 # split data into train and test sets before EDA - avoid data leakage through 
 # the data scientist
 ################################################################################
@@ -820,10 +660,6 @@ vec_freq_dist(a_vec = train_df$Central.Air, a_vec_name = 'train_df$Central.Air')
 
 writeLines('\n*********************')
 vec_freq_dist(a_vec = test_df$Central.Air, a_vec_name = 'test_df$Central.Air')
-################################################################################
-################################################################################
-################################################################################
-
 
 ################################################################################
 # fit a logistic regression model
@@ -834,7 +670,7 @@ writeLines('fit a logistic regression model\n')
 writeLines('\n*********************')
 writeLines('model_1\n')
 
-model_1 <- glm(Central.Air ~ Year.Built+Gr.Liv.Area, data = train_df, family = binomial(link = 'logit'))
+model_1 <- glm(Central.Air ~ Year.Built+Fireplaces+Pool.Area, data = train_df, family = binomial(link = 'logit'))
 print(summary(model_1))
 return_list <- log_reg_pseudo_r_square(model_1)
 r_square_model_1 <- return_list['r_square'][[1]]
@@ -876,10 +712,6 @@ writeLines('display regression coefficients (odds)\n')
 print(exp(coef(model_2)))
 
 ################################################################################
-################################################################################
-################################################################################
-
-################################################################################
 # train set predictions
 ################################################################################
 writeLines('\n****************************************************************')
@@ -910,9 +742,6 @@ print(unname(classification_report_train$byClass['Pos Pred Value']))
 writeLines('\nspecificity (also known as true negative rate):')
 print(unname(classification_report_train$byClass['Specificity']))
 ################################################################################
-################################################################################
-################################################################################
-
 ################################################################################
 # test set predictions
 ################################################################################
