@@ -711,6 +711,28 @@ writeLines('\n*********************')
 writeLines('display regression coefficients (odds)\n')
 print(exp(coef(model_2)))
 
+writeLines('model_3\n')
+
+model_3 <- glm(Central.Air ~ Full.Bath+Half.Bath+Bedroom.AbvGr, 
+               data = train_df, family = binomial(link = 'logit'))
+print(summary(model_3))
+return_list <- log_reg_pseudo_r_square(model_3)
+r_square_model_3 <- return_list['r_square'][[1]]
+p_value_model_3 <- return_list['p_value'][[1]]
+
+writeLines('\n*********************')
+writeLines('McFadden\'s Pseudo R^2 and its p-value:\n')
+writeLines(paste('McFadden\'s Pseudo R^2: ', r_square_model_3))
+writeLines(paste('McFadden\'s Pseudo R^2 p-value: ', p_value_model_3))
+
+writeLines('\n*********************')
+writeLines('display regression coefficients (log-odds)\n')
+print(coef(model_3))
+
+writeLines('\n*********************')
+writeLines('display regression coefficients (odds)\n')
+print(exp(coef(model_3)))
+
 ################################################################################
 # train set predictions
 ################################################################################
