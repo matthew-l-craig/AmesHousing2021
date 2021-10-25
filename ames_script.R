@@ -742,7 +742,7 @@ writeLines('\n****************************************************************')
 return_list <- classifier_performance(model_2, a_model_name = 'model_2', 
                                       train_df, a_data_df_name = 'train_df', 
                                       y_true = train_df$Central.Air, FALSE)
-title("Exitibit 7: Train Data ROC Curve Plot", line = 3)
+title("Exhibit 8: Train Data ROC Curve Plot", line = 3)
 
 y_probs_train <- return_list['y_probs'][[1]]
 y_preds_train <- return_list['y_preds'][[1]]
@@ -772,7 +772,7 @@ writeLines('\n****************************************************************')
 return_list <- classifier_performance(model_2, a_model_name = 'model_2', 
                                       test_df, a_data_df_name = 'test_df', 
                                       y_true = test_df$Central.Air, FALSE)
-title("Exitibit 8: Test Data ROC Curve Plot", line= 3)
+title("Exhibit 9: Test Data ROC Curve Plot", line= 3)
 y_probs_test <- return_list['y_probs'][[1]]
 y_preds_test <- return_list['y_preds'][[1]]
 y_true_test <- return_list['y_true'][[1]]
