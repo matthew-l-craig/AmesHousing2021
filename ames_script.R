@@ -584,7 +584,7 @@ writeLines('The model chosen is: fit_4')
 the_data <- ames_df_1[, c('Gr.Liv.Area', 'Garage.Area', 'Overall.Qual', 'Kitchen.Qual', 'Mas.Vnr.Area', 'Total.Bsmt.SF')]
 
 pred <- predict(fit_4, the_data)
-plot(ames_df_1$SalePrice, pred, main = 'Exhibit 5: predicted vs actual sale price',
+plot(ames_df_1$SalePrice, pred, main = 'Exhibit 6: predicted vs actual sale price',
      xlab = 'Actual sale price', ylab = 'Predicted sale price')
 abline(a=0, b=1, col= 'blue')
 grid(col = "black")
@@ -794,6 +794,13 @@ print(unname(classification_report_test$byClass['Specificity']))
 
 writeLines('\n\n\n\n\n\n\n\n\n')
 
+
+
+################################################################################
+################################################################################
+################################################################################
+
+################################################################################
 
 
 
