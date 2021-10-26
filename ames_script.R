@@ -605,6 +605,14 @@ print(frac_ames_df_1_mae)
 #Logistic Regression - Central Air Predictors?
 ################################################################################
 ################################################################################
+# SQL findings
+################################################################################
+# There are only 95% of observations from our dataset have central air.
+# We still would like to predict homes with central air to try out logistic
+# regression.
+sqldf('select "Central.Air", count(*) from ames_df_1 group by "Central.Air"')
+
+################################################################################
 #Plots
 ################################################################################
 ggplot(ames_df_1) + geom_boxplot(aes(x=Central.Air, y= Year.Built),color="darkblue",fill="blue",
@@ -692,7 +700,8 @@ print(exp(coef(model_1)))
 writeLines('\n*********************')
 writeLines('model_2\n')
 
-model_2 <- glm(Central.Air ~ Year.Built+Gr.Liv.Area+SalePrice+Yr.Sold, data = train_df, family = binomial(link = 'logit'))
+model_2 <- glm(Central.Air ~ Year.Built+Gr.Liv.Area+SalePrice+Yr.Sold, 
+               data = train_df, family = binomial(link = 'logit'))
 print(summary(model_2))
 return_list <- log_reg_pseudo_r_square(model_2)
 r_square_model_2 <- return_list['r_square'][[1]]
