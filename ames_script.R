@@ -399,9 +399,11 @@ ames_df_1 <- ames_df_1 %>%
 
 
 
-corrs <- round(cor(ames_df_1[, unlist(lapply(ames_df_1, is.numeric))], use = "pairwise"),
-               2)
-corrplot(corrs, type = "upper", col = brewer.pal( n = 8, name = "RdYlBu"), title = "Exhibit 7: Correlation Plot of The Ames Housing Dataset",mar=c(0,0,1,0))
+corrs <- round(cor(ames_df_1[, unlist(lapply(ames_df_1, is.numeric))], 
+                   use = "pairwise"), 2)
+corrplot(corrs, type = "upper", col = brewer.pal( n = 8, name = "RdYlBu"), 
+         title = "Exhibit 6a: Ames Housing Dataset Correlation Plot", 
+         mar=c(0,0,1,0))
 
 # Second corrplot with only homes built before 2000
 corrs <- round(cor(filter(ames_df_1, Year.Built < 2000)[, unlist(lapply(ames_df_1, is.numeric))], use = "pairwise"),
@@ -558,8 +560,7 @@ par(mfrow = c(1,1))
 vif(fit_3)
 
 fit_4 <- lm(formula = SalePrice ~ Gr.Liv.Area + Garage.Area + Overall.Qual +
-              Kitchen.Qual + Mas.Vnr.Area  + Total.Bsmt.SF, 
-            data = ames_df_1)
+              Kitchen.Qual + Mas.Vnr.Area  + Total.Bsmt.SF, data = ames_df_1)
 
 print(summary(fit_4))
 
@@ -584,7 +585,7 @@ writeLines('The model chosen is: fit_4')
 the_data <- ames_df_1[, c('Gr.Liv.Area', 'Garage.Area', 'Overall.Qual', 'Kitchen.Qual', 'Mas.Vnr.Area', 'Total.Bsmt.SF')]
 
 pred <- predict(fit_4, the_data)
-plot(ames_df_1$SalePrice, pred, main = 'Exhibit 6: predicted vs actual sale price',
+plot(ames_df_1$SalePrice, pred, main = 'Exhibit 6c: predicted vs actual sale price',
      xlab = 'Actual sale price', ylab = 'Predicted sale price')
 abline(a=0, b=1, col= 'blue')
 grid(col = "black")
