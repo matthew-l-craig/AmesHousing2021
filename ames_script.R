@@ -39,6 +39,7 @@ library(pROC)
 library(scales)
 library(stats)
 library(sqldf)
+library(dunn.test)
 
 process_corr_matrix<-function(corr_matrix,pos_corr_thresh, neg_corr_thresh) {
   
@@ -436,6 +437,11 @@ multi_corr_df <- corr_df[corr_df['Var1'] != 'SalePrice' &
 # neighborhood on sales price
 # Claim: H1
 
+print(shapiro.test(ames_df_1$SalePrice))
+
+print(leveneTest(SalePrice ~ Bldg.Type*Neighborhood))
+
+print(leveneTest(SalePrice ~ Bedroom.AbvGr*Full.Bath))
 
 ################################################################################
 # compute summary statistics
@@ -467,57 +473,23 @@ writeLines('claim: H1')
 # perform test
 # wants a data frame
 alpha <- 0.05
-anova <- aov(ames_df_1$SalePrice ~ ames_df_1$Neighborhood, data = ames_df_1)
+anova <- kruskal.test(ames_df_1$SalePrice ~ ames_df_1$Neighborhood, data = ames_df_1)
 
 writeLines('\n***************************')
-writeLines('results of one-way anova')
-print(summary(anova))
+writeLines('results of Kruskal-Wallace on Neighborhood')
+print(anova)
 
 
-# visualize the results
+dunn <- dunn.test(x = ames_df_1$SalePrice,  g = ames_df_1$Neighborhood)
+
+dunn <- as.data.frame(dunn)
+dunn <- dunn %>% filter(P > alpha/2)
+
+dunn
+
+?# visualize the results
 boxplot(ames_df_1$SalePrice ~ ames_df_1$Neighborhood, data = ames_df_1)
 
-
-# save summary to an object
-anova_summary <- summary(anova)
-
-# p-value
-p_value <- anova_summary[[1]][1, 'Pr(>F)']
-
-writeLines('\n***************************')
-# compare the p-value to alpha and make decision
-if (p_value > alpha) {
-  decision = 'fail to reject H0'
-} else {
-  decision = 'reject h0'
-}
-writeLines(paste('decision: ', decision))
-
-writeLines('\n***************************')
-writeLines('use TukeyHSD to understand differences between the means\n')
-# see differences
-# diff: differences between the means
-# lwr, upr: bounds of 95% confidence intervals for diff
-# p adj: adjusted for multiple comparisons
-print(TukeyHSD(anova))
-
-################################################################################
-# Developing Hypothesis - Two way anova
-################################################################################
-#Bedrooms
-writeLines('H0: There is no difference in sales price of houses with different bedroom types')
-writeLines('H1: There is a difference in sales price of houses with different bedroom types')
-writeLines('Claim: H1')
-
-# Bathrooms
-writeLines('H0: There is no difference in sales price of houses with different bathroom types')
-writeLines('H1: There is a difference in sales price of houses with different bathroom types')
-writeLines('Claim: H1')
-
-#Bedrooms & Bathrooms Hypothesis
-writeLines('H0: There is no interaction effect between type of bedroom and type of bathroom on sales price')
-writeLines('H1: There is an interaction effect between type of bedroom and type of bathroom on sales price')
-writeLines('Claim: H1')
 
 ################################################################################
 # # compute two-way anova
