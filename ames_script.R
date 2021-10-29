@@ -400,9 +400,11 @@ ames_df_1 <- ames_df_1 %>%
 
 
 
-corrs <- round(cor(ames_df_1[, unlist(lapply(ames_df_1, is.numeric))], use = "pairwise"),
-               2)
-corrplot(corrs, type = "upper", col = brewer.pal( n = 8, name = "RdYlBu"), title = "Exhibit 7: Correlation Plot of The Ames Housing Dataset",mar=c(0,0,1,0))
+corrs <- round(cor(ames_df_1[, unlist(lapply(ames_df_1, is.numeric))], 
+                   use = "pairwise"), 2)
+corrplot(corrs, type = "upper", col = brewer.pal( n = 8, name = "RdYlBu"), 
+         title = "Exhibit 6a: Ames Housing Dataset Correlation Plot", 
+         mar=c(0,0,1,0))
 
 # Second corrplot with only homes built before 2000
 corrs <- round(cor(filter(ames_df_1, Year.Built < 2000)[, unlist(lapply(ames_df_1, is.numeric))], use = "pairwise"),
@@ -530,13 +532,12 @@ par(mfrow = c(1,1))
 vif(fit_3)
 
 fit_4 <- lm(formula = SalePrice ~ Gr.Liv.Area + Garage.Area + Overall.Qual +
-              Kitchen.Qual + Mas.Vnr.Area  + Total.Bsmt.SF, 
-            data = ames_df_1)
+              Kitchen.Qual + Mas.Vnr.Area  + Total.Bsmt.SF, data = ames_df_1)
 
 print(summary(fit_4))
 
 par(mfrow = c(2,2))
-plot(fit_3)
+plot(fit_4)
 par(mfrow = c(1,1))
 
 vif(fit_4)
@@ -556,7 +557,7 @@ writeLines('The model chosen is: fit_4')
 the_data <- ames_df_1[, c('Gr.Liv.Area', 'Garage.Area', 'Overall.Qual', 'Kitchen.Qual', 'Mas.Vnr.Area', 'Total.Bsmt.SF')]
 
 pred <- predict(fit_4, the_data)
-plot(ames_df_1$SalePrice, pred, main = 'Exhibit 5: predicted vs actual sale price',
+plot(ames_df_1$SalePrice, pred, main = 'Exhibit 6c: predicted vs actual sale price',
      xlab = 'Actual sale price', ylab = 'Predicted sale price')
 abline(a=0, b=1, col= 'blue')
 grid(col = "black")
@@ -576,6 +577,14 @@ print(frac_ames_df_1_mae)
 ################################################################################
 #Logistic Regression - Central Air Predictors?
 ################################################################################
+################################################################################
+# SQL findings
+################################################################################
+# There are only 95% of observations from our dataset have central air.
+# We still would like to predict homes with central air to try out logistic
+# regression.
+sqldf('select "Central.Air", count(*) from ames_df_1 group by "Central.Air"')
+
 ################################################################################
 #Plots
 ################################################################################
@@ -664,7 +673,8 @@ print(exp(coef(model_1)))
 writeLines('\n*********************')
 writeLines('model_2\n')
 
-model_2 <- glm(Central.Air ~ Year.Built+Gr.Liv.Area+SalePrice+Yr.Sold, data = train_df, family = binomial(link = 'logit'))
+model_2 <- glm(Central.Air ~ Year.Built+Gr.Liv.Area+SalePrice+Yr.Sold, 
+               data = train_df, family = binomial(link = 'logit'))
 print(summary(model_2))
 return_list <- log_reg_pseudo_r_square(model_2)
 r_square_model_2 <- return_list['r_square'][[1]]
@@ -714,7 +724,7 @@ writeLines('\n****************************************************************')
 return_list <- classifier_performance(model_2, a_model_name = 'model_2', 
                                       train_df, a_data_df_name = 'train_df', 
                                       y_true = train_df$Central.Air, FALSE)
-title("Exitibit 7: Train Data ROC Curve Plot", line = 3)
+title("Exhibit 8: Train Data ROC Curve Plot", line = 3)
 
 y_probs_train <- return_list['y_probs'][[1]]
 y_preds_train <- return_list['y_preds'][[1]]
@@ -744,7 +754,7 @@ writeLines('\n****************************************************************')
 return_list <- classifier_performance(model_2, a_model_name = 'model_2', 
                                       test_df, a_data_df_name = 'test_df', 
                                       y_true = test_df$Central.Air, FALSE)
-title("Exitibit 8: Test Data ROC Curve Plot", line= 3)
+title("Exhibit 9: Test Data ROC Curve Plot", line= 3)
 y_probs_test <- return_list['y_probs'][[1]]
 y_preds_test <- return_list['y_preds'][[1]]
 y_true_test <- return_list['y_true'][[1]]
@@ -766,6 +776,13 @@ print(unname(classification_report_test$byClass['Specificity']))
 
 writeLines('\n\n\n\n\n\n\n\n\n')
 
+
+
+################################################################################
+################################################################################
+################################################################################
+
+################################################################################
 
 
 
