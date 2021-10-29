@@ -565,7 +565,7 @@ fit_4 <- lm(formula = SalePrice ~ Gr.Liv.Area + Garage.Area + Overall.Qual +
 print(summary(fit_4))
 
 par(mfrow = c(2,2))
-plot(fit_3)
+plot(fit_4)
 par(mfrow = c(1,1))
 
 vif(fit_4)
