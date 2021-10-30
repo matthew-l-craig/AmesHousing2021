@@ -23,6 +23,9 @@ if (!is.null(names(sessionInfo()$otherPkgs))) {
          unload = TRUE)
 }
 
+################################################################################
+# load packages
+################################################################################
 library(car)
 library(ggpubr)
 library(dplyr)
@@ -41,6 +44,9 @@ library(stats)
 library(sqldf)
 library(dunn.test)
 
+################################################################################
+# helpful functions
+################################################################################
 process_corr_matrix<-function(corr_matrix,pos_corr_thresh, neg_corr_thresh) {
   
   # Get pairwise table
@@ -73,8 +79,6 @@ process_corr_matrix<-function(corr_matrix,pos_corr_thresh, neg_corr_thresh) {
   corr_df
   
 }
-
-
 
 vec_freq_dist <- function(a_vec, a_vec_name = '', rel_freq = 'yes', 
                           freq = 'yes')
@@ -161,15 +165,20 @@ log_reg_pseudo_r_square <- function(logistic) {
   return(list('r_square' = r_square, 'p_value' = p_value))
 }
 
+################################################################################
+# set seed for reproducibility
+################################################################################
 set.seed(44)
 
-
+################################################################################
+# load data
+################################################################################
 dirname(rstudioapi::getActiveDocumentContext()$path)
 ames_df <- read.table(paste('AmesHousing.csv', sep=''),
 header = TRUE, sep=',',row.names = 'PID')
 
 ################################################################################
-# Select attributes to use
+# select attributes to use
 ################################################################################ 
 continuous_attrs<-c('Lot.Area','Mas.Vnr.Area','Total.Bsmt.SF','Gr.Liv.Area',
                     'Garage.Area','Wood.Deck.SF','Open.Porch.SF',
@@ -186,17 +195,19 @@ nominal_attrs<-c('Neighborhood','Bldg.Type','Roof.Style',
                  'Roof.Matl','Mas.Vnr.Type','Foundation','Heating','Central.Air',
                  'Sale.Condition')
 
-#attribute vector to use
+# attribute vector to use
 attrs<-c(continuous_attrs,nominal_attrs,discrete_attrs,ordinal_attrs)
 
-#only look at single family homes with normal sale conditions
-ames_df_1<-filter(ames_df, ames_df$Bldg.Type=='1Fam', ames_df$Sale.Condition=='Normal')
+# only look at single family homes with normal sale conditions
+ames_df_1<-filter(ames_df, ames_df$Bldg.Type=='1Fam', 
+                  ames_df$Sale.Condition=='Normal')
 
 ames_df_1 <- ames_df_1[colnames(ames_df_1) %in% attrs]
-ames_df_1$Date<- as.Date(paste(ames_df_1$Yr.Sold,ames_df_1$Mo.Sold, "01",sep = "-"))
+ames_df_1$Date<- as.Date(paste(ames_df_1$Yr.Sold,ames_df_1$Mo.Sold, 
+                               "01",sep = "-"))
 
 ################################################################################
-#Prepare attributes for regression by making them factors
+# prepare attributes for regression by making them factors
 ################################################################################
 #Ordinal
 # ames_df_1$Overall.Qual<-factor(ames_df_1$Overall.Qual, ordered = TRUE)
@@ -220,35 +231,25 @@ ames_df_1$Central.Air<-factor(ames_df_1$Central.Air)
 ames_df_1$Sale.Condition<-factor(ames_df_1$Sale.Condition)
 
 #Discrete
-#ames_df_1$Year.Built<-factor(ames_df_1$Year.Built)
 ames_df_1$Year.Remod.Add<-factor(ames_df_1$Year.Remod.Add)
 ames_df_1$Full.Bath<-factor(ames_df_1$Full.Bath)
-# ames_df_1$Half.Bath<-factor(ames_df_1$Half.Bath)
 ames_df_1$Bedroom.AbvGr<-factor(ames_df_1$Bedroom.AbvGr)
-# ames_df_1$TotRms.AbvGrd<-factor(ames_df_1$TotRms.AbvGrd)
-# ames_df_1$Fireplaces<-factor(ames_df_1$Fireplaces)
-# ames_df_1$Garage.Yr.Blt<-factor(ames_df_1$Garage.Yr.Blt)
-# ames_df_1$Garage.Cars<-factor(ames_df_1$Garage.Cars)
-# ames_df_1$Mo.Sold<-factor(ames_df_1$Mo.Sold)
-# ames_df_1$Yr.Sold<-factor(ames_df_1$Yr.Sold)
 
 ames_df_1
 
 ################################################################################
 # preliminary EDA
 ################################################################################
-
 str(ames_df_1)
 summary(ames_df_1)
 
-#Where are the houses?
+# where are the houses?
 ggplot(ames_df_1, aes(x=Neighborhood)) + geom_bar(color="darkblue",fill="blue",
                                                                alpha=0.5)+
   ggtitle("Exhibit 1:Histogram of Ames Housing Sales by Neighborhood" )+
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
 
-#average sale in each neighborhood
-
+# average sale in each neighborhood
 average_sale<- ames_df_1 %>% 
   group_by(Neighborhood) %>% 
   summarise(avgSalePrice=mean(SalePrice))
@@ -266,31 +267,23 @@ ggplot(ames_df_1, aes(x=Neighborhood)) + geom_bar(color="darkblue",fill="blue",
   ggtitle("Exhibit 1:Histogram of Ames Housing Sales by Neighborhood" )+
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
 
-
-
-
-
-
-
-#How expensive are the houses?
+# how expensive are the houses?
 mu<- mean(ames_df_1$SalePrice)
 
-ggplot(ames_df_1, aes(x=SalePrice)) + geom_histogram(color="darkblue",fill="blue",
-                                                               alpha=0.5, bins = 50)+
+ggplot(ames_df_1, aes(x=SalePrice)) + geom_histogram(color="darkblue",
+                    fill="blue", alpha=0.5, bins = 50)+
   ggtitle("Exhibit 2:Histogram of Ames Housing Sale Prices" )+
   labs(x="Sale Price")+
   scale_x_continuous(labels=scales::dollar_format())+
   geom_vline(xintercept = mu, color= "red", linetype= "dashed")+
   geom_label(aes(x=mu,y=280, label="Mean Sales Price"), col="red")
   
-  
-#When were the houses built?
-ggplot(ames_df_1, aes(x=Year.Built))+ geom_histogram(color="darkblue",fill="blue",
-                                                               alpha=0.5, stat="count")+
+# when were the houses built?
+ggplot(ames_df_1, aes(x=Year.Built))+ geom_histogram(color="darkblue",
+                    fill="blue", alpha=0.5, stat="count")+
   ggtitle("Exhibit 3:Histogram of the Year Homes were Built within Ames City Limits" )
 
-
-#When were the houses sold?
+# when were the houses sold?
 ggplot(ames_df_1, aes(x=Yr.Sold)) + geom_histogram(color="darkblue",fill="blue",
                                                                alpha=0.5)+
   ggtitle("Exhibit x:Histogram of Ames Housing Sales by Year" )
@@ -300,37 +293,37 @@ ggplot(ames_df_1, aes(x=Mo.Sold)) + geom_histogram(color="darkblue",fill="blue",
   ggtitle("Exhibit x:Histogram of Ames Housing Sales by Month" )+
   scale_x_continuous(breaks = seq(1, 12, 1))
 
-#trend 
+# trend 
 ames_df_1 %>% count(Date) %>% 
   ggplot(aes(x=Date, y=n))+
   geom_line(color="blue",alpha=0.5)+
   ggtitle("Exhibit 1:Trend of Ames House Sales" )
 
-#How big are the houses?
-ggplot(ames_df_1, aes(x=ames_df_1$Gr.Liv.Area)) + geom_histogram(color="darkblue",fill="blue",
-                                                             alpha=0.5)+
-  ggtitle("Exhibit 4:Histogram of Home Sizes by Above Gr. SF" ) + xlab('Square Footage')
+# how big are the houses?
+ggplot(ames_df_1, aes(x=ames_df_1$Gr.Liv.Area)) + 
+  geom_histogram(color="darkblue",fill="blue", alpha=0.5) +
+  ggtitle("Exhibit 4:Histogram of Home Sizes by Above Gr. SF" ) + 
+  xlab('Square Footage')
 
-#How big are the lots?
+# how big are the lots?
 
-#SF to acres = 43560 = 1 acre
+# SF to acres = 43560 = 1 acre
 acres<- ames_df_1$Lot.Area/43560
 
 ggplot(ames_df_1, aes(x=acres)) + geom_histogram(color="darkblue",fill="blue",
-                                                                 alpha=0.5,
-                                                 bins = 50)+
+                        alpha=0.5, bins = 50) +
   ggtitle("Exhibit x:Historgram of Ames Housing Lot Sizes (SF)")
 
 ################################################################################
-# Explore missingness graphically
+# explore missingness graphically
 ################################################################################
 aggr(ames_df_1,prop=TRUE, numbers=TRUE)
 matrixplot(ames_df_1, labels = TRUE)
 
 ################################################################################
-#Explore missingness 
+# explore missingness 
 ################################################################################
-#Drop columns with missingness exceeding threshold
+# drop columns with missingness exceeding threshold
 print('fractional NA report:')
 miss_thresh = 0.25
 keeps <- c()
@@ -360,34 +353,37 @@ ames_df_1 <- ames_df_1[keeps]
 # input "0" in the blank entries within Mas.Vnr.Type 
 ################################################################################
 
-ames_df_1$Mas.Vnr.Area<-ifelse(is.na(ames_df_1$Mas.Vnr.Area),0,ames_df_1$Mas.Vnr.Area)
+ames_df_1$Mas.Vnr.Area<-ifelse(is.na(ames_df_1$Mas.Vnr.Area), 0,
+                               ames_df_1$Mas.Vnr.Area)
 aggr(ames_df_1, prop = TRUE, numbers = TRUE)
-
 
 summary(ames_df_1)
 tableview<-head(ames_df_1)
 
 ################################################################################
-# Visualize data
+# visualize data
 ################################################################################
-
 options(scipen = 100)
 
 ames_df_1$Yr.Sold <- as.factor(ames_df_1$Yr.Sold)
 
 ggboxplot(ames_df_1, x = "Kitchen.Qual", y = "SalePrice",
-                color = "Yr.Sold", legend = 'right') + ggtitle('Exhibit 5: Sale Price Based on Kitchen Quality') + xlab('Kitchen Qual') + ylab('Sale Price') 
+                color = "Yr.Sold", legend = 'right') + 
+  ggtitle('Exhibit 5: Sale Price Based on Kitchen Quality') + 
+  xlab('Kitchen Qual') + ylab('Sale Price') 
 
 ggboxplot(ames_df_1, x = "Garage.Cars", y = "SalePrice",
-                color = "Yr.Sold", legend = 'right') + ggtitle('Exhibit 6: Sale Price Based on Garage Size') + xlab('Car Bays') + ylab('Sale Price') 
-
+                color = "Yr.Sold", legend = 'right') + 
+  ggtitle('Exhibit 6: Sale Price Based on Garage Size') + 
+  xlab('Car Bays') + ylab('Sale Price') 
 
 Sys.sleep(3)
 
 ################################################################################
 # check out correlations for numerical variables
-
-homes_sold_by_yr <- as.data.frame(sqldf('SELECT count("Lot.Area") as count, "Yr.Sold" FROM ames_df_1 GROUP BY "Yr.Sold"'))
+################################################################################
+homes_sold_by_yr <- as.data.frame(sqldf('SELECT count("Lot.Area") as count, 
+                                "Yr.Sold" FROM ames_df_1 GROUP BY "Yr.Sold"'))
 
 match_yr <- function(Yr){
   
@@ -398,19 +394,18 @@ ames_df_1 <- ames_df_1 %>%
   rowwise() %>%
   mutate(total_sold_that_year = match_yr(Yr.Sold))
 
-
-
 corrs <- round(cor(ames_df_1[, unlist(lapply(ames_df_1, is.numeric))], 
                    use = "pairwise"), 2)
 corrplot(corrs, type = "upper", col = brewer.pal( n = 8, name = "RdYlBu"), 
          title = "Exhibit 6a: Ames Housing Dataset Correlation Plot", 
          mar=c(0,0,1,0))
 
-# Second corrplot with only homes built before 2000
-corrs <- round(cor(filter(ames_df_1, Year.Built < 2000)[, unlist(lapply(ames_df_1, is.numeric))], use = "pairwise"),
-               2)
-corrplot(corrs, type = "upper", col = brewer.pal( n = 8, name = "RdYlBu"), title = "Exhibit 7: Correlation Plot of Home Built < 2000",mar=c(0,0,1,0))
-
+# second corrplot with only homes built before 2000
+corrs <- round(cor(filter(ames_df_1, Year.Built < 2000)
+        [, unlist(lapply(ames_df_1, is.numeric))], use = "pairwise"), 2)
+corrplot(corrs, type = "upper", col = brewer.pal( n = 8, name = "RdYlBu"), 
+         title = "Exhibit 7: Correlation Plot of Home Built < 2000",
+         mar=c(0,0,1,0))
 
 # find the strongest correlations
 corr_df <- process_corr_matrix(corrs, 0.50, -0.50)
@@ -420,16 +415,20 @@ multi_corr_df <- corr_df[corr_df['Var1'] != 'SalePrice' &
                            corr_df['Var2'] != 'SalePrice',]
 
 ################################################################################
-# Developing Hypothesis - One way anova
+# developing hypothesis - One way anova
 ################################################################################
 # Building Type Hypothesis
-# H0: There is no difference in sales price of houses with different building types
-# H1: There is a difference in sales price of houses with different building types
+# H0: There is no difference in sales price of houses with different 
+# building types
+# H1: There is a difference in sales price of houses with different 
+# building types
 # Claim: H1
 # 
 # Neighborhood Hypothesis
-# H0: There is no difference in sales price of houses with different neighborhoods
-# H1: There is a difference in sales price of houses with different neighborhoods
+# H0: There is no difference in sales price of houses with different 
+# neighborhoods
+# H1: There is a difference in sales price of houses with different 
+# neighborhoods
 # Claim: H1
 # 
 # Building Type / Neighborhood Hypothesis
@@ -475,7 +474,8 @@ writeLines('claim: H1')
 # perform test
 # wants a data frame
 alpha <- 0.05
-anova <- kruskal.test(ames_df_1$SalePrice ~ ames_df_1$Neighborhood, data = ames_df_1)
+anova <- kruskal.test(ames_df_1$SalePrice ~ ames_df_1$Neighborhood, 
+                      data = ames_df_1)
 
 writeLines('\n***************************')
 writeLines('results of Kruskal-Wallace on Neighborhood')
@@ -489,13 +489,12 @@ dunn <- dunn %>% filter(P > alpha/2)
 
 dunn
 
-?# visualize the results
+# visualize the results
 boxplot(ames_df_1$SalePrice ~ ames_df_1$Neighborhood, data = ames_df_1)
 
-
 ################################################################################
-# # compute two-way anova
-# ################################################################################
+# compute two-way anova
+################################################################################
 writeLines('\n****************************************************************')
 writeLines('compute two-way anova:')
 result2 <- aov(SalePrice ~ Bedroom.AbvGr * Full.Bath, data = ames_df_1)
@@ -553,8 +552,8 @@ writeLines('The model chosen is: fit_4')
 ################################################################################
 # make a prediction with model 4
 ################################################################################
-# the_data <- df_1[, c('Gr.Liv.Area', 'Garage.Area', 'Total.Bsmt.SF')]
-the_data <- ames_df_1[, c('Gr.Liv.Area', 'Garage.Area', 'Overall.Qual', 'Kitchen.Qual', 'Mas.Vnr.Area', 'Total.Bsmt.SF')]
+the_data <- ames_df_1[, c('Gr.Liv.Area', 'Garage.Area', 'Overall.Qual', 
+                          'Kitchen.Qual', 'Mas.Vnr.Area', 'Total.Bsmt.SF')]
 
 pred <- predict(fit_4, the_data)
 plot(ames_df_1$SalePrice, pred, main = 'Exhibit 6c: predicted vs actual sale price',
@@ -575,8 +574,9 @@ print(ames_df_1_mae)
 print(frac_ames_df_1_mae)
 
 ################################################################################
-#Logistic Regression - Central Air Predictors?
+# logistic Regression - Central Air Predictors
 ################################################################################
+
 ################################################################################
 # SQL findings
 ################################################################################
@@ -586,47 +586,45 @@ print(frac_ames_df_1_mae)
 sqldf('select "Central.Air", count(*) from ames_df_1 group by "Central.Air"')
 
 ################################################################################
-#Plots
+# plots
 ################################################################################
-ggplot(ames_df_1) + geom_boxplot(aes(x=Central.Air, y= Year.Built),color="darkblue",fill="blue",
-                                 alpha=0.5)+
+ggplot(ames_df_1) + geom_boxplot(aes(x=Central.Air, y= Year.Built),
+                                 color="darkblue",fill="blue", alpha=0.5)+
   ggtitle("Exhibit 1:Boxplot of Central Air Homes vs Year Built" )+
   labs(x="Central Air")
 
+ggplot(ames_df_1) + geom_boxplot(aes(x=Central.Air, y= SalePrice),
+                                 color="darkblue",fill="blue", alpha=0.5)+
+  ggtitle("Exhibit 2:Boxplot of Central Air Homes vs Sale Price" ) +
+  labs(x="Central Air") +
+  scale_y_continuous(labels=scales::dollar_format())
 
-
-ggplot(ames_df_1) + geom_boxplot(aes(x=Central.Air, y= SalePrice),color="darkblue",fill="blue",
-                                 alpha=0.5)+
-  ggtitle("Exhibit 2:Boxplot of Central Air Homes vs Sale Price" )+
-  labs(x="Central Air")+
-scale_y_continuous(labels=scales::dollar_format())
-
-# Why are some sale prices so low?
+# why are some sale prices so low?
 
 ames_df_low_price <- filter(ames_df_1, SalePrice < 100000)
 
 summary(ames_df_low_price)
 
-
-ggplot(ames_df_1) + geom_boxplot(aes(x=Central.Air, y= Gr.Liv.Area),color="darkblue",fill="blue",
-                                 alpha=0.5)+
-  ggtitle("Exhibit 3:Boxplot of Central Air Homes vs Above Ground Livable Area (SF)" )+
+ggplot(ames_df_1) + geom_boxplot(aes(x=Central.Air, y= Gr.Liv.Area),
+                                 color="darkblue",fill="blue", alpha=0.5)+
+  ggtitle("Exhibit 3:Boxplot of Central Air Homes vs Above Ground Livable Area (SF)" ) +
   labs(x="Central Air")
 
 attach(ames_df_1)
 
-ggplot() + geom_bar( aes(x = Yr.Sold, fill = Neighborhood)) + ggtitle('Count of Homes Sold per Yr Factored by Neighborhood') + xlab('Year Sold')
+ggplot() + geom_bar( aes(x = Yr.Sold, fill = Neighborhood)) + 
+  ggtitle('Count of Homes Sold per Yr Factored by Neighborhood') + 
+      xlab('Year Sold')
 
 # split data into train and test sets before EDA - avoid data leakage through 
 # the data scientist
 ################################################################################
 writeLines('\n****************************************************************')
 writeLines('split data into train and test sets\n')
-trainIndex<- createDataPartition(ames_df_1$Central.Air, p=0.7, list= FALSE, times =1)
+trainIndex<- createDataPartition(ames_df_1$Central.Air, p=0.7, list= FALSE, 
+                                 times =1)
 train_df<-ames_df_1[trainIndex,]
 test_df<-ames_df_1[-trainIndex,]
-
-
 
 writeLines('\n*********************')
 writeLines('head(train_df):\n')
@@ -720,7 +718,6 @@ print(exp(coef(model_3)))
 ################################################################################
 writeLines('\n****************************************************************')
 
-
 return_list <- classifier_performance(model_2, a_model_name = 'model_2', 
                                       train_df, a_data_df_name = 'train_df', 
                                       y_true = train_df$Central.Air, FALSE)
@@ -745,7 +742,7 @@ print(unname(classification_report_train$byClass['Pos Pred Value']))
 
 writeLines('\nspecificity (also known as true negative rate):')
 print(unname(classification_report_train$byClass['Specificity']))
-################################################################################
+
 ################################################################################
 # test set predictions
 ################################################################################
@@ -770,18 +767,9 @@ writeLines('\npositive predictive value (also known as precision):')
 print(unname(classification_report_test$byClass['Pos Pred Value']))
 writeLines('\nspecificity (also known as true negative rate):')
 print(unname(classification_report_test$byClass['Specificity']))
-################################################################################
-################################################################################
-################################################################################
 
+################################################################################
 writeLines('\n\n\n\n\n\n\n\n\n')
-
-
-
-################################################################################
-################################################################################
-################################################################################
-
 ################################################################################
 
 
